@@ -1,4 +1,4 @@
-package com.TweetServer;
+package com.tweetsearch;
 
 import static spark.Spark.*;
 
