@@ -16,8 +16,8 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="/Users/nicklawler222/Code/lucene-5.0.0/core/lucene-core-5.0.0.jar"/>
-	<classpathentry kind="lib" path="/Users/nicklawler222/Code/lucene-5.0.0/queryparser/lucene-queryparser-5.0.0.jar"/>
-	<classpathentry kind="lib" path="/Users/nicklawler222/Code/lucene-5.0.0/analysis/common/lucene-analyzers-common-5.0.0.jar"/>
+	<classpathentry kind="lib" path="bin/lucene-analyzers-common-5.0.0.jar"/>
+	<classpathentry kind="lib" path="bin/lucene-core-5.0.0.jar"/>
+	<classpathentry kind="lib" path="bin/lucene-queryparser-5.0.0.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
