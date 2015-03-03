@@ -6,11 +6,16 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.stream.Stream;
 
 import org.apache.lucene.document.Field;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.document.IntField;
+import org.apache.lucene.document.LongField;
+import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
@@ -110,6 +115,55 @@ public class IndexBuilder {
 			System.exit(1);
 		}
 
+	}
+	private static void AddTextField(String name, ResultSet rs, Document d)
+			throws SQLException {
+		if (rs.getString(name) != null) {
+			d.add(new TextField(name, rs.getString(name), Field.Store.YES));
+
+		} else {
+			d.add(new TextField(name, "N/A", Field.Store.YES));
+		}
+	}
+
+	private static void AddStringField(String name, String value, Document d)
+			throws SQLException {
+		if (value != null) {
+			d.add(new StringField(name, value, Field.Store.YES));
+
+		} else {
+			d.add(new StringField(name, "N/A", Field.Store.YES));
+		}
+	}
+	private static void AddStringField(String name, ResultSet rs, Document d)
+			throws SQLException {
+		if (rs.getString(name) != null) {
+			d.add(new StringField(name, rs.getString(name), Field.Store.YES));
+
+		} else {
+			d.add(new StringField(name, "N/A", Field.Store.YES));
+		}
+	}
+
+	private static void AddIntField(String name, ResultSet rs, Document d)
+			throws SQLException {
+		if (rs.getString(name) != null) {
+			d.add(new IntField(name, rs.getInt(name), Field.Store.YES));
+
+		} else {
+			d.add(new IntField(name, 0, Field.Store.YES));
+		}
+	}
+
+	private static void AddLongTimeField(String name, ResultSet rs, Document d)
+			throws SQLException {
+		if (rs.getString(name) != null) {
+			long x = rs.getDate(name).getTime();
+			d.add(new LongField(name, x, Field.Store.YES));
+
+		} else {
+			d.add(new LongField(name, 0, Field.Store.YES));
+		}
 	}
 
 }
