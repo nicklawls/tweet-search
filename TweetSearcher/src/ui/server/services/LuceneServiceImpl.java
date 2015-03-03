@@ -50,8 +50,8 @@ public class LuceneServiceImpl extends RemoteServiceServlet implements
 		try {
 			if (isearcher == null)
 				initSearcher();
-			// String[] fields = { "user", "text", "created_at", "geo_location",
-			// "linkTitle", "hasBadLink" };
+//			String[] fields = { "user", "text", "created_at", "geo_location",
+//					"linkTitle", "hasBadLink" };
 
 			StandardAnalyzer analyzer = new StandardAnalyzer();
 
@@ -80,6 +80,11 @@ public class LuceneServiceImpl extends RemoteServiceServlet implements
 
 	private Tweet newTweet(Document d) {
 		Tweet t = new Tweet();
+//		d.get("user");
+//		d.get("text");
+//		d.get("created_at");
+//		d.get("geo_location");
+//		d.get("linkTitle");
 		// TODO: grab document fields and add them to the tweet
 		return t;
 	}
