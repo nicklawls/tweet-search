@@ -2,6 +2,7 @@ package com.tweetsearch;
 
 import static spark.Spark.*;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -31,7 +32,7 @@ public class SearchServer {
 			Directory directory = null;
 			
 			// TODO verify args
-			Path indexDir  = Paths.get(args[0]);
+			File indexDir  = new File(args[0]);
 			
 			try {
 			    directory = FSDirectory.open(indexDir);

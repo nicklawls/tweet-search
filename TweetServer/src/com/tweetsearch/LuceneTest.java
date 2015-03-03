@@ -1,6 +1,8 @@
 package com.tweetsearch;
 
+import java.io.File;
 import java.io.IOException;
+
 import static java.nio.file.Paths.get;
 
 import org.apache.lucene.*;
@@ -18,6 +20,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.util.Version;
 
 
 public class LuceneTest {
@@ -27,14 +30,14 @@ public class LuceneTest {
 		Directory directory = null;
 		
 		try {
-		    directory = FSDirectory.open(get("/tmp/testindex"));
+		    directory = FSDirectory.open(new File("/tmp/testindex"));
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.err.println("failed to read directory: " + e.getMessage());
 			System.exit(1);
 		}
 		
-		IndexWriterConfig config = new IndexWriterConfig(analyzer);
+		IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_40,analyzer);
 		IndexWriter iwriter = null;
 		try {
 			iwriter = new IndexWriter(directory, config);

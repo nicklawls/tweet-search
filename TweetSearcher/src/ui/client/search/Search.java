@@ -31,20 +31,20 @@ public class Search extends Composite {
 	public Search() {
 		initWidget(uiBinder.createAndBindUi(this));
 		LuceneServiceAsync luceneService = GWT.create(LuceneService.class);
-		luceneService.getTweets(new AsyncCallback<String>() {
-
-			@Override
-			public void onSuccess(String result) {
-				results.setText(result);
-
-			}
-
-			@Override
-			public void onFailure(Throwable caught) {
-				// TODO Auto-generated method stub
-
-			}
-		});
+//		luceneService.getTweets(new AsyncCallback<String>() {
+//
+//			@Override
+//			public void onSuccess(String result) {
+//				results.setText(result);
+//
+//			}
+//
+//			@Override
+//			public void onFailure(Throwable caught) {
+//				// TODO Auto-generated method stub
+//
+//			}
+//		});
 	}
 
 }
