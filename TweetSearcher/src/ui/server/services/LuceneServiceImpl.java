@@ -80,11 +80,16 @@ public class LuceneServiceImpl extends RemoteServiceServlet implements
 
 	private Tweet newTweet(Document d) {
 		Tweet t = new Tweet();
-//		d.get("user");
-//		d.get("text");
-//		d.get("created_at");
-//		d.get("geo_location");
-//		d.get("linkTitle");
+		d.get("username");
+		d.get("text");
+		d.get("createdAt");
+		d.get("longitude");
+		d.get("latitude");
+		d.get("linkTitle");
+		d.get("favoritecount");
+		d.get("retweets");
+		d.get("language");
+		d.get("streetAddress");
 		// TODO: grab document fields and add them to the tweet
 		return t;
 	}
