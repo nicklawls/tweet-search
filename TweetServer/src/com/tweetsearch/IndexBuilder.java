@@ -1,5 +1,6 @@
 package com.tweetsearch;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -31,13 +32,14 @@ public class IndexBuilder {
 		
 		// TODO verify args
 		Path indexDir  = Paths.get(args[0]);
-		Path tweetsDir = Paths.get(args[1]);
+		Path tweetsDir = Paths.get(args[1]);	
 		
 		
 		try {
-		    directory = FSDirectory.open(indexDir.toFile());
-		    if (directory.listAll().length >= 1) {
-		    	System.err.println("Index directory is occupied, please provide an empty directory");
+		    directory = FSDirectory.open(indexDir.toFile());		    
+		    File[] dirList = indexDir.toFile().listFiles();
+		    if ( dirList != null  && dirList.length >= 1) {
+		    	System.err.println("Index directory " + indexDir.toString() +  " is occupied, please provide an empty directory");
 		    	System.exit(1);
 		    }
 		} catch (IOException e) {
