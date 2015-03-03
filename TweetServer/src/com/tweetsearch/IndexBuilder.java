@@ -15,6 +15,7 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.util.Version;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -34,7 +35,7 @@ public class IndexBuilder {
 		
 		
 		try {
-		    directory = FSDirectory.open(indexDir);
+		    directory = FSDirectory.open(indexDir.toFile());
 		    if (directory.listAll().length >= 1) {
 		    	System.err.println("Index directory is occupied, please provide an empty directory");
 		    	System.exit(1);
@@ -47,7 +48,7 @@ public class IndexBuilder {
 		
 
 		
-		IndexWriterConfig config = new IndexWriterConfig(analyzer);
+		IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_40,analyzer);
 		IndexWriter iwriter = null;
 		try {
 			iwriter = new IndexWriter(directory, config);
