@@ -58,7 +58,7 @@ public class IndexBuilder {
 		
 		JSONParser jsonParser = new JSONParser();
 		
-		try (DirectoryStream<Path> stream = Files.newDirectoryStream(tweetsDir, "tweets[0-3].json") ) {
+		try (DirectoryStream<Path> stream = Files.newDirectoryStream(tweetsDir, "tweets*.json") ) {
 			
 			for (Path tweetFile : stream) {
 			

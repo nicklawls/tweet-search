@@ -22,8 +22,6 @@ import org.apache.lucene.store.FSDirectory;import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 
-
-
 public class SearchServer {
 
 	public static void main(String[] args) {
