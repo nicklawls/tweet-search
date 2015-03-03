@@ -1,2 +1,0 @@
-serviceClass: ui.client.services.LuceneService
-path: A5B29DBE04B45F8126A2B2D1AF8E920F.gwt.rpc

@@ -27,6 +27,7 @@ public class TweetSearcher implements EntryPoint {
 	 * This is the entry point method.
 	 */
 	public void onModuleLoad() {
+		
 		Header h = new Header();
 		RootPanel.get("header").add(h);
 	}

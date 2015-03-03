@@ -2,13 +2,17 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:w="urn:import:com.google.gwt.widget.client">
 	<ui:style>
-	
+
 	</ui:style>
 
 	<ui:with field='css' type='ui.client.resources.CSSAndImageResources' />
 	<g:HTMLPanel styleName="{css.header.pageAlign}">
 		<g:HorizontalPanel>
-			<g:Label ui:field="results">Add search results</g:Label>
+			<g:VerticalPanel>
+				<g:Label ui:field="results">Add search results</g:Label>
+			</g:VerticalPanel>
+			<g:HTMLPanel ui:field="mapPanel" />
 		</g:HorizontalPanel>
+
 	</g:HTMLPanel>
 </ui:UiBinder>

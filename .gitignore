@@ -1,3 +1,6 @@
 
 TweetSearcher/war/WEB-INF/classes/.gitignore
 TweetSearcher/test-classes
+TweetSearcher/gwt-unitCache/*
+TweetSearcher/gwt-unitCache
+TweetSearcher/war/indexes/*
