@@ -6,9 +6,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.Optional;
+import java.util.Date;
 import java.util.stream.Stream;
 
 import org.apache.lucene.document.Field;
@@ -33,8 +31,7 @@ public class IndexBuilder {
 	public static void main(String[] args) {
 
 		String[] fields = { "user", "text", "created_at", "geo_location",
-				"linkTitle", "favorite_count", "palce", "retweet_count",
-				"language"};
+				"linkTitle", "favorite_count", "retweet_count", "language"};
 
 		StandardAnalyzer analyzer = new StandardAnalyzer();
 		Directory directory = null;
@@ -101,7 +98,14 @@ public class IndexBuilder {
 											break;
 										case "text": AddTextField("text", json.get("text").toString(), doc);
 											break;
-										case "created_at": AddStringField("created_at", json.get("created_at").toString(), doc);
+										case "created_at": 
+											try {
+												String dateString = json.get("created_at").toString();
+												long dateMS = Date.parse(dateString); // deprecated, but works on this date format
+												AddLongTimeField("created_at", dateMS, doc);
+											} catch (Exception e) {
+												System.err.println("time parse error!: " + e.getMessage());
+											}
 											break;
 										case "geo_location":
 											String longLatObj = json.get("geo_location").toString();
@@ -115,11 +119,6 @@ public class IndexBuilder {
 										case "favorite_count": 
 											Integer favoriteCount = Integer.parseInt(json.get("favorite_count").toString());
 											AddIntField("favoriteCount", favoriteCount, doc);
-											break;
-										case "palce": // typo in tweet files
-											String placeObj = json.get("palce").toString();
-											String streetAddress = extractFromTwitter4jObject("streetAddress='", placeObj, "'");
-											AddStringField("streetAddress", streetAddress, doc);
 											break;
 										case "retweet_count":
 											Integer retweets = Integer.parseInt(json.get("retweet_count").toString());
@@ -165,6 +164,7 @@ public class IndexBuilder {
 	
 	private static void AddTextField(String name, String text, Document d) {
 		d.add(new TextField(name, text, Field.Store.YES));
+		d.getField(name).boost();
 
 	}
 	private static void AddStringField(String name, String value, Document d) {
@@ -181,7 +181,7 @@ public class IndexBuilder {
 
 	private static void AddLongTimeField(String name, Long value, Document d) {
 		d.add(new LongField(name, value, Field.Store.YES));
-
+		d.getField(name).boost();
 	}
 
 }
