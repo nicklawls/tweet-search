@@ -8,11 +8,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.apache.lucene.document.Field;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
+import org.apache.lucene.document.FloatField;
 import org.apache.lucene.document.IntField;
 import org.apache.lucene.document.LongField;
 import org.apache.lucene.document.StringField;
@@ -31,7 +33,8 @@ public class IndexBuilder {
 	public static void main(String[] args) {
 
 		String[] fields = { "user", "text", "created_at", "geo_location",
-				"linkTitle", "hasBadLink" };
+				"linkTitle", "favorite_count", "palce", "retweet_count",
+				"language"};
 
 		StandardAnalyzer analyzer = new StandardAnalyzer();
 		Directory directory = null;
@@ -90,9 +93,41 @@ public class IndexBuilder {
 							for (String field : fields) {
 
 								if (json.containsKey(field)) {
-									String content = json.get(field).toString();
-									doc.add(new Field(field, content,
-											TextField.TYPE_STORED));
+									switch (field) {
+										case "user": 
+											String userObj = json.get("user").toString();
+											String username = extractFromTwitter4jObject("screenName='", userObj, "'");
+											AddStringField("user", username, doc);
+											break;
+										case "text": AddTextField("text", json.get("text").toString(), doc);
+											break;
+										case "created_at": AddStringField("created_at", json.get("created_at").toString(), doc);
+											break;
+										case "geo_location":
+											String longLatObj = json.get("geo_location").toString();
+											String lat = extractFromTwitter4jObject("latitude=", longLatObj, ",");
+											String lon = extractFromTwitter4jObject("longitude=", longLatObj, "}");
+											AddFloatField("latitude", Float.parseFloat(lat), doc);
+											AddFloatField("longitude", Float.parseFloat(lon), doc);
+											break;
+										case "linkTitle": AddStringField("link", json.get("linkTitle").toString(), doc);
+											break;
+										case "favorite_count": 
+											Integer favoriteCount = Integer.parseInt(json.get("favorite_count").toString());
+											AddIntField("favoriteCount", favoriteCount, doc);
+											break;
+										case "palce": // typo in tweet files
+											String placeObj = json.get("palce").toString();
+											String streetAddress = extractFromTwitter4jObject("streetAddress='", placeObj, "'");
+											AddStringField("streetAddress", streetAddress, doc);
+											break;
+										case "retweet_count":
+											Integer retweets = Integer.parseInt(json.get("retweet_count").toString());
+											AddIntField("favoriteCount", retweets, doc);
+											break;
+										case "language": AddStringField("language", json.get("language").toString(), doc);
+											break;
+									}
 								}
 							}
 							return doc;
@@ -119,7 +154,15 @@ public class IndexBuilder {
 		}
 
 	}
-
+	
+	private static String extractFromTwitter4jObject(String fieldname, String t4jObj, 
+			String delimit) {
+		int start = t4jObj.indexOf(fieldname) + fieldname.length();
+		int end = t4jObj.indexOf(delimit, start);
+		
+		return t4jObj.substring(start, end);
+	}
+	
 	private static void AddTextField(String name, String text, Document d) {
 		d.add(new TextField(name, text, Field.Store.YES));
 
@@ -130,6 +173,10 @@ public class IndexBuilder {
 
 	private static void AddIntField(String name, int value, Document d) {
 		d.add(new IntField(name, value, Field.Store.YES));
+	}
+	
+	private static void AddFloatField(String name, float value, Document d) {
+		d.add(new FloatField(name, value, Field.Store.YES));
 	}
 
 	private static void AddLongTimeField(String name, Long value, Document d) {
