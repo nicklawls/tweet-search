@@ -23,5 +23,7 @@ public interface CSSAndImageResources extends ClientBundle {
 
 	public interface main extends CssResource {
 		String button();
+		String sep();
+		String sepLeft();
 	}
 }

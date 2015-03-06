@@ -9,6 +9,7 @@
 	<g:HTMLPanel styleName="{css.header.pageAlign}">
 		<g:HorizontalPanel ui:field="main">
 			<g:TextBox ui:field="searchText" />
+			<g:ListBox ui:field="type"/>
 			<g:Button ui:field="searchButton" styleName="{css.main.button}">Search</g:Button>
 		</g:HorizontalPanel>
 	</g:HTMLPanel>

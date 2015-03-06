@@ -12,5 +12,5 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 @RemoteServiceRelativePath("luceneServlet")
 public interface LuceneService extends RemoteService {
-	public List<Tweet> getTweets(String searchText);
+	public List<Tweet> getTweets(String searchText,String type);
 }

@@ -1,0 +1,2 @@
+serviceClass: ui.client.services.LuceneService
+path: 51E02F2D559C2DCFAE3666782276DBE4.gwt.rpc
