@@ -9,7 +9,7 @@
 	<g:HTMLPanel styleName="{css.header.pageAlign}">
 		<g:HorizontalPanel>
 			<g:VerticalPanel>
-				<g:Label ui:field="results">Add search results</g:Label>
+				<g:VerticalPanel ui:field="results" />
 			</g:VerticalPanel>
 			<g:HTMLPanel ui:field="mapPanel" />
 		</g:HorizontalPanel>

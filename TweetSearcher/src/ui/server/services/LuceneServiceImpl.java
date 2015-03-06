@@ -4,32 +4,42 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.IndexableField;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.search.BooleanClause.Occur;
+import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.store.SimpleFSDirectory;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import org.apache.lucene.util.Version;
 
 import ui.client.services.LuceneService;
 import ui.shared.Tweet;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+import com.ibm.icu.text.DateFormat;
+import com.ibm.icu.text.SimpleDateFormat;
 
 public class LuceneServiceImpl extends RemoteServiceServlet implements
 		LuceneService {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	IndexSearcher isearcher = null;
 	DirectoryReader ireader = null;
 	private Object luceneLock = new Object();
@@ -39,29 +49,36 @@ public class LuceneServiceImpl extends RemoteServiceServlet implements
 		synchronized (luceneLock) {
 			if (isearcher == null) {
 				ireader = IndexReader.open(new SimpleFSDirectory(new File(
-						"indexes/tweet_index_name")));
+						"indexes/index")));
 				isearcher = new IndexSearcher(ireader);
 			}
 		}
 	}
 
-	public List<Tweet> getTweets(String searchText) {
+	public List<Tweet> getTweets(String searchText, String type) {
 		List<Tweet> tweets = new ArrayList<Tweet>();
 		try {
 			if (isearcher == null)
 				initSearcher();
-//			String[] fields = { "user", "text", "created_at", "geo_location",
-//					"linkTitle", "hasBadLink" };
+//			if (searchText.length() == 0)
+//				searchText = "test";
+			// String[] fields = { "user", "text", "created_at", "geo_location",
+			// "linkTitle", "hasBadLink" };
 
-			StandardAnalyzer analyzer = new StandardAnalyzer();
+			BooleanQuery bq = new BooleanQuery();
+			String[] fields = new String[] { "user", "text" };
 
-			String fieldname = "user";
-			QueryParser queryParser = new QueryParser(fieldname, analyzer);
+			StandardAnalyzer analyzer = new StandardAnalyzer(Version.LUCENE_40);
+			MultiFieldQueryParser mfqp = new MultiFieldQueryParser(
+					Version.LUCENE_40, fields, analyzer);
 
-			Query query = queryParser.parse(searchText);
+			Query q = new TermQuery(new Term("text", searchText));
+			bq.add(q, Occur.SHOULD);
 
-			// top 10 results
-			ScoreDoc[] hits = isearcher.search(query, null, 10).scoreDocs;
+			TopScoreDocCollector collector = TopScoreDocCollector.create(10,
+					true);
+			isearcher.search(bq, collector);
+			ScoreDoc[] hits = collector.topDocs().scoreDocs;
 
 			List<ScoreDoc> hitsList = new ArrayList<ScoreDoc>(
 					Arrays.asList(hits));
@@ -71,26 +88,30 @@ public class LuceneServiceImpl extends RemoteServiceServlet implements
 				tweets.add(newTweet(d));
 			}
 
-		} catch (IOException | ParseException e) {
+		} catch (IOException | java.text.ParseException e) {
 			e.printStackTrace();
 		}
 
 		return tweets;
 	}
 
-	private Tweet newTweet(Document d) {
-		Tweet t = new Tweet();
-		d.get("username");
-		d.get("text");
-		d.get("createdAt");
-		d.get("longitude");
-		d.get("latitude");
-		d.get("linkTitle");
-		d.get("favoritecount");
-		d.get("retweets");
-		d.get("language");
-		d.get("streetAddress");
-		// TODO: grab document fields and add them to the tweet
+	private Tweet newTweet(Document d) throws java.text.ParseException {
+		// DateFormat format = new SimpleDateFormat("", Locale.ENGLISH);
+		// Date date = format.parse(d.get("created_at"));
+		// System.out.println(date);
+		// System.out.println(d.get("created_at"));
+
+		// Tweet t = new Tweet(d.get("created_at"),
+		// Integer.parseInt(d.get("favoriteCount")),
+		// Integer.parseInt(d.get("retweets")), Float.parseFloat(d
+		// .get("longitude")),
+		// Float.parseFloat(d.get("latitude")), d.get("language"),
+		// d.get("username"), d.get("text"), d.get("link"));
+		Tweet t = new Tweet(d.get("created_at"), d.get("favoriteCount"),
+				d.get("retweets"), d.get("longitude"), d.get("latitude"),
+				d.get("language"), d.get("user"), d.get("text"),
+				d.get("link"));
+
 		return t;
 	}
 }

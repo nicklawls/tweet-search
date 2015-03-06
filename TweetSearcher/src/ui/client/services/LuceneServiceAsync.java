@@ -10,5 +10,5 @@ import ui.shared.Tweet;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public interface LuceneServiceAsync {
-	public void getTweets(String searchText, AsyncCallback<List<Tweet>> callback);
+	public void getTweets(String searchText,String type, AsyncCallback<List<Tweet>> callback);
 }

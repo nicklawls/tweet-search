@@ -6,3 +6,11 @@
 .button:hover {
 	color: blue;
 }
+
+.sep{
+	margin:10px;
+}
+
+.sepLeft{
+	margin-left: 20px;
+}

@@ -1,25 +1,111 @@
 package ui.shared;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class Tweet {
+public class Tweet implements Serializable{
 
-	private Date createdAt;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	private String createdAt;
 
 	private int favoriteCount;
 	private int retweets;
 
-	private long longitude;//geolocation.longitude
-	private long latitude;//geolocation.latitude
+	private float longitude;// geolocation.longitude
+	private float latitude;// geolocation.latitude
 
 	private String language;
-	private String streetAddress;//place.getStreetAddress
-	private String username;//user.getName
+	// private String streetAddress;//place.getStreetAddress
+	private String username;// user.getName
+
 	private String text;
 	private String link;
+
+	public String getCreatedAt() {
+		return createdAt;
+	}
+
+	public int getFavoriteCount() {
+		return favoriteCount;
+	}
+
+	public int getRetweets() {
+		return retweets;
+	}
+
+	public float getLongitude() {
+		return longitude;
+	}
+
+	public float getLatitude() {
+		return latitude;
+	}
+
+	public String getLanguage() {
+		return language;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public String getText() {
+		return text;
+	}
+
+	public String getLink() {
+		return link;
+	}
 
 	public Tweet() {
 
 	}
 
+	public Tweet(String createdAt, int favoriteCount, int retweets,
+			float longitude, float latitude, String language, String username,
+			String text, String link) {
+		super();
+		this.createdAt = createdAt;
+		this.favoriteCount = favoriteCount;
+		this.retweets = retweets;
+		this.longitude = longitude;
+		this.latitude = latitude;
+		this.language = language;
+		this.username = username;
+		this.text = text;
+		this.link = link;
+	}
+
+	public Tweet(String createdAt, String favoriteCount, String retweets,
+			String longitude, String latitude, String language,
+			String username, String text, String link) {
+		this.createdAt = createdAt;
+		if (favoriteCount == null) {
+			this.favoriteCount = 0;
+			System.out.println("FAVORITE COUNT WAS NULL");
+		} else
+			this.favoriteCount = Integer.parseInt(favoriteCount);
+		if (retweets == null) {
+			this.retweets = 0;
+			System.out.println("RETWEETS COUNT WAS NULL");
+		} else
+			this.retweets = Integer.parseInt(retweets);
+		if (longitude == null) {
+			this.longitude = 0;
+			System.out.println("LONGITUDE COUNT WAS NULL");
+		} else
+			this.longitude = Float.parseFloat(longitude);
+		if (latitude == null) {
+			this.latitude = 0;
+			System.out.println("LATITUDE COUNT WAS NULL");
+		} else
+			this.latitude = Float.parseFloat(latitude);
+		this.username = username;
+		this.text = text;
+		this.link = link;
+	}
 }
