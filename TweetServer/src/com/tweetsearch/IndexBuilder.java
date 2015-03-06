@@ -73,7 +73,7 @@ public class IndexBuilder {
 
 				Stream<String> lines = Files.lines(tweetFile);
 
-				Document[] docs = (Document[]) lines
+				Document[] docs = lines
 						.map((line) -> {
 							try {
 								return (JSONObject) jsonParser.parse(line);
