@@ -4,3 +4,7 @@ TweetSearcher/test-classes
 TweetSearcher/gwt-unitCache/*
 TweetSearcher/gwt-unitCache
 TweetSearcher/war/indexes/*
+TweetSearcher/war/tweetsearcher/*
+TweetSearcher/war/tweetsearcher/
+TweetSearcher/war/WEB-INF/deploy/*
+
