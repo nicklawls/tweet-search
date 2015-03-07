@@ -22,6 +22,7 @@ import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.Version;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -31,7 +32,7 @@ public class IndexBuilder {
 	public static void main(String[] args) {
 
 		String[] fields = { "user", "text", "created_at", "geo_location",
-				"linkTitle", "favorite_count", "retweet_count", "language"};
+				"linkTitle", "favorite_count", "retweet_count", "language", "hashtags"};
 
 		StandardAnalyzer analyzer = new StandardAnalyzer();
 		Directory directory = null;
@@ -94,7 +95,9 @@ public class IndexBuilder {
 										case "user": 
 											String userObj = json.get("user").toString();
 											String username = extractFromTwitter4jObject("screenName='", userObj, "'");
+											String imageUrl = extractFromTwitter4jObject("profileImageUrl='", userObj, "'");
 											AddStringField("user", username, doc);
+											AddStringField("profileImageUrl", imageUrl, doc);
 											break;
 										case "text": AddTextField("text", json.get("text").toString(), doc);
 											break;
@@ -125,6 +128,22 @@ public class IndexBuilder {
 											AddIntField("favoriteCount", retweets, doc);
 											break;
 										case "language": AddStringField("language", json.get("language").toString(), doc);
+											break;
+										case "hashtags":
+										try {
+											JSONArray tagsJson = (JSONArray) jsonParser.parse(json.get("hashtags").toString());
+											String tagsList = "";
+											for (Object hashtagObj : tagsJson) {
+												JSONObject hashtag = (JSONObject) hashtagObj;
+												tagsList += hashtag.get("text").toString() + " ";
+											}
+											if (!tagsList.isEmpty()) {
+												AddTextField("hashtags", // chop off trailing " "
+														tagsList.substring(0, tagsList.length()-1), doc);
+											}
+										} catch (Exception e) {
+											System.err.println("Hashtag parse error: " + e.getMessage());
+										}
 											break;
 									}
 								}
