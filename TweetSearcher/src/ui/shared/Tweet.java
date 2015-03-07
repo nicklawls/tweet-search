@@ -3,7 +3,7 @@ package ui.shared;
 import java.io.Serializable;
 import java.util.Date;
 
-public class Tweet implements Serializable{
+public class Tweet implements Serializable {
 
 	/**
 	 * 
@@ -24,6 +24,15 @@ public class Tweet implements Serializable{
 
 	private String text;
 	private String link;
+	private String linkTitle;
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
+	}
+
+	public String getLinkTitle() {
+		return linkTitle;
+	}
 
 	public String getCreatedAt() {
 		return createdAt;
@@ -67,7 +76,7 @@ public class Tweet implements Serializable{
 
 	public Tweet(String createdAt, int favoriteCount, int retweets,
 			float longitude, float latitude, String language, String username,
-			String text, String link) {
+			String text, String linkTitle, String link) {
 		super();
 		this.createdAt = createdAt;
 		this.favoriteCount = favoriteCount;
@@ -77,12 +86,13 @@ public class Tweet implements Serializable{
 		this.language = language;
 		this.username = username;
 		this.text = text;
+		this.linkTitle = linkTitle;
 		this.link = link;
 	}
 
 	public Tweet(String createdAt, String favoriteCount, String retweets,
 			String longitude, String latitude, String language,
-			String username, String text, String link) {
+			String username, String text, String linkTitle, String link) {
 		this.createdAt = createdAt;
 		if (favoriteCount == null) {
 			this.favoriteCount = 0;
@@ -106,6 +116,7 @@ public class Tweet implements Serializable{
 			this.latitude = Float.parseFloat(latitude);
 		this.username = username;
 		this.text = text;
+		this.linkTitle = linkTitle;
 		this.link = link;
 	}
 }

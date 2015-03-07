@@ -2,6 +2,8 @@ package ui.server.services;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -110,8 +112,26 @@ public class LuceneServiceImpl extends RemoteServiceServlet implements
 		Tweet t = new Tweet(d.get("created_at"), d.get("favoriteCount"),
 				d.get("retweets"), d.get("longitude"), d.get("latitude"),
 				d.get("language"), d.get("user"), d.get("text"),
-				d.get("link"));
+				d.get("link"),getUrlStringFrom(d.get("text")));
 
 		return t;
+	}
+	
+	private String getUrlStringFrom(String text) {
+		String[] words = text.split("\\s+|”|\"");
+		String urlString = null;
+
+		for (String word : words) try {
+				URL url = new URL(word); // parse with URL constructor				
+				urlString = url.toString(); // but just returns a string
+				
+				if (urlString.endsWith(".")) {
+					urlString = urlString.substring(0, urlString.length()-1); // shave off "."
+				}
+			} catch (MalformedURLException e) {
+				// Exception-based control flow FTW
+			}
+
+		return urlString;
 	}
 }

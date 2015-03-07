@@ -1,10 +1,13 @@
 package ui.client.search;
 
+import ui.client.services.LuceneService;
+import ui.client.services.LuceneServiceAsync;
 import ui.shared.Tweet;
 
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Label;
