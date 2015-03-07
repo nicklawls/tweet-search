@@ -18,22 +18,30 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.BooleanClause.Occur;
+import org.apache.lucene.search.TopFieldDocs;
 import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.store.SimpleFSDirectory;
 import org.apache.lucene.util.Version;
 
 import ui.client.services.LuceneService;
+import ui.shared.Constants;
 import ui.shared.Tweet;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.ibm.icu.text.DateFormat;
 import com.ibm.icu.text.SimpleDateFormat;
+
+import org.apache.lucene.search.SortField.Type;
 
 public class LuceneServiceImpl extends RemoteServiceServlet implements
 		LuceneService {
@@ -57,47 +65,151 @@ public class LuceneServiceImpl extends RemoteServiceServlet implements
 		}
 	}
 
-	public List<Tweet> getTweets(String searchText, String type) {
+	public List<Tweet> getTweets(String query, String type) {
 		List<Tweet> tweets = new ArrayList<Tweet>();
 		try {
 			if (isearcher == null)
 				initSearcher();
-			// if (searchText.length() == 0)
-			// searchText = "test";
-			// String[] fields = { "user", "text", "created_at", "geo_location",
-			// "linkTitle", "hasBadLink" };
+			ScoreDoc[] hits = null;
 
-			BooleanQuery bq = new BooleanQuery();
-			String[] fields = new String[] { "user", "text" };
+			if (query.length() == 0)
+				hits = getRecentTweets();
+			else {
+				String[] separate = query.split(" ");
+				if (type.equals(Constants.GENERAL))
+					hits = generalSearh(separate);
+				else if (type.equals(Constants.HASHTAGS)) {
+					hits = getHashTags(separate);
+				} else if (type.equals(Constants.USER)) {
+					hits = getUser(separate);
+				}
+			}
 
-			StandardAnalyzer analyzer = new StandardAnalyzer(Version.LUCENE_40);
-			MultiFieldQueryParser mfqp = new MultiFieldQueryParser(
-					Version.LUCENE_40, fields, analyzer);
-			Query q = null;
+			// BooleanQuery bq = new BooleanQuery();
+			// String[] fields = new String[] { "user", "text" };
+			//
+			// StandardAnalyzer analyzer = new
+			// StandardAnalyzer(Version.LUCENE_40);
+			// MultiFieldQueryParser mfqp = new MultiFieldQueryParser(
+			// Version.LUCENE_40, fields, analyzer);
+			// Query q = null;
+			//
+			// q = new TermQuery(new Term("text", searchText));
+			// bq.add(q, Occur.SHOULD);
+			// q = new TermQuery(new Term("user", searchText));
+			// bq.add(q, Occur.SHOULD);
+			//
+			// TopScoreDocCollector collector = TopScoreDocCollector.create(10,
+			// true);
+			// isearcher.search(bq, collector);
+			// ScoreDoc[] hits = collector.topDocs().scoreDocs;
+			//
 
-			q = new TermQuery(new Term("text", searchText));
-			bq.add(q, Occur.SHOULD);
-			q = new TermQuery(new Term("user", searchText));
-			bq.add(q, Occur.SHOULD);
-
-			TopScoreDocCollector collector = TopScoreDocCollector.create(10,
-					true);
-			isearcher.search(bq, collector);
-			ScoreDoc[] hits = collector.topDocs().scoreDocs;
-
-			List<ScoreDoc> hitsList = new ArrayList<ScoreDoc>(
-					Arrays.asList(hits));
-
-			for (ScoreDoc hit : hitsList) {
+			for (ScoreDoc hit : hits) {
 				Document d = isearcher.doc(hit.doc);
 				tweets.add(newTweet(d));
 			}
 
-		} catch (IOException | java.text.ParseException e) {
+		} catch (IOException | java.text.ParseException | ParseException e) {
 			e.printStackTrace();
 		}
 
 		return tweets;
+	}
+
+	private ScoreDoc[] generalSearh(String[] query) throws IOException,
+			ParseException {
+		BooleanQuery bq = new BooleanQuery();
+		Query q = null;
+		String[] fields = new String[] { "text", "hashtags", "user" };
+		StandardAnalyzer sa = new StandardAnalyzer(Version.LUCENE_40);
+		MultiFieldQueryParser mfqp = new MultiFieldQueryParser(
+				Version.LUCENE_40, fields, sa);
+
+		for (String s : query) {
+
+			System.out.println("Looking for general: " + s);
+
+			q = mfqp.parse(mfqp.escape(s));
+			bq.add(q, BooleanClause.Occur.SHOULD);
+			// q = new TermQuery(new Term("text", s));
+			// bq.add(q, Occur.SHOULD);
+			// q = new TermQuery(new Term("hashtags", s));
+			// bq.add(q, Occur.SHOULD);
+		}
+		return getScoreDoc(bq);
+	}
+
+	private ScoreDoc[] getRecentTweets() throws IOException {
+		BooleanQuery bq = new BooleanQuery();
+		Query q = null;
+		q = NumericRangeQuery.newIntRange("retweets", 0, 100, true, true);
+		bq.add(q, Occur.MUST);
+		System.out.println("Getting recent tweets");
+		Sort sorter = new Sort();
+		SortField sf = new SortField("created_at", Type.LONG, true);
+		sorter.setSort(sf);
+		TopFieldDocs tfd = isearcher.search(bq, 10, sorter);
+		return tfd.scoreDocs;
+	}
+
+	private ScoreDoc[] getUser(String[] users) throws IOException,
+			ParseException {
+		BooleanQuery bq = new BooleanQuery();
+		Query q = null;
+		// String[] fields = new String[] { "text", "user" };
+		// StandardAnalyzer sa = new StandardAnalyzer(Version.LUCENE_40);
+		// MultiFieldQueryParser mfqp = new MultiFieldQueryParser(
+		// Version.LUCENE_40, fields, sa);
+
+		for (String s : users) {
+			System.out.println("Looking for User: " + s);
+			// q = mfqp.parse(mfqp.escape(s));
+			// bq.add(q, BooleanClause.Occur.SHOULD);
+
+			q = new TermQuery(new Term("user", s));
+			bq.add(q, Occur.SHOULD);
+			// s = "@" + s;
+			// System.out.println("looking for text: " + s);
+			// q = new TermQuery(new Term("text", s));
+			// bq.add(q, Occur.SHOULD);
+
+			// if (s.contains("@"))
+			// s = s.replaceAll("@", "");
+			// q = new TermQuery(new Term("user", s));
+			// bq.add(q, Occur.SHOULD);
+			// s = "@" + s;
+			// q = new TermQuery(new Term("text", s));
+			// bq.add(q, Occur.SHOULD);
+		}
+		return getScoreDoc(bq);
+	}
+
+	private ScoreDoc[] getHashTags(String[] tags) throws IOException,
+			ParseException {
+		BooleanQuery bq = new BooleanQuery();
+		Query q = null;
+		String[] fields = new String[] { "hashtags" };
+		StandardAnalyzer sa = new StandardAnalyzer(Version.LUCENE_40);
+		MultiFieldQueryParser mfqp = new MultiFieldQueryParser(
+				Version.LUCENE_40, fields, sa);
+		for (String s : tags) {
+			System.out.println("Looking for HashTags: " + s);
+			q = mfqp.parse(mfqp.escape(s));
+			bq.add(q, BooleanClause.Occur.SHOULD);
+
+			// if (s.contains("#"))
+			// s = s.replaceAll("#", "");
+			// q = new TermQuery(new Term("hashtags", s));
+			// bq.add(q, Occur.SHOULD);
+		}
+		return getScoreDoc(bq);
+	}
+
+	private ScoreDoc[] getScoreDoc(BooleanQuery bq) throws IOException {
+		TopScoreDocCollector collector = TopScoreDocCollector.create(10, true);
+		isearcher.search(bq, collector);
+		return collector.topDocs().scoreDocs;
 	}
 
 	private Tweet newTweet(Document d) throws java.text.ParseException {

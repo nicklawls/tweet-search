@@ -51,6 +51,8 @@ public class Search extends Composite {
 	VerticalPanel results;
 	@UiField
 	HTMLPanel mapPanel;
+	@UiField
+	HorizontalPanel main;
 
 	public Search() {
 		initWidget(uiBinder.createAndBindUi(this));
@@ -68,7 +70,13 @@ public class Search extends Composite {
 	public Search(String query, String type) {
 		initWidget(uiBinder.createAndBindUi(this));
 
+		main.setWidth("90%");
+		main.setCellWidth(mapPanel, "50%");
+		main.setCellWidth(results, "50%");
+		results.setWidth("90%");
+		mapPanel.setWidth("90%");
 		mapPanel.clear();
+
 		LatLng location = LatLng.newInstance(33.8833, -117.0167);
 		MapOptions opts = MapOptions.newInstance();
 		opts.setCenter(location);
@@ -78,6 +86,9 @@ public class Search extends Composite {
 		map = new MapWidget(opts);
 		map.setSize("500px", "500px");
 		mapPanel.add(map);
+		mapPanel.setVisible(false);
+
+		// map.setSize("500px", "500px");
 
 		LuceneServiceAsync luceneService = GWT.create(LuceneService.class);
 		start = System.currentTimeMillis();
@@ -117,6 +128,7 @@ public class Search extends Composite {
 		Marker localMark = Marker.newInstance(mopts);
 		bounds.extend(loc);
 		localMark.setMap(map);
+		mapPanel.setVisible(true);
 	}
 
 	public void resize(Boolean fitMap) {

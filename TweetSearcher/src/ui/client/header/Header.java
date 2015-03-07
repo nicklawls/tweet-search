@@ -25,6 +25,12 @@ import com.google.gwt.user.client.ui.Widget;
 public class Header extends Composite {
 
 	private static HeaderUiBinder uiBinder = GWT.create(HeaderUiBinder.class);
+	
+	private static Header myInstance = new Header();
+	
+	public static synchronized Header getInstance() {
+		return myInstance;
+	}
 
 	interface HeaderUiBinder extends UiBinder<Widget, Header> {
 	}
@@ -42,10 +48,11 @@ public class Header extends Composite {
 		initWidget(uiBinder.createAndBindUi(this));
 		type.addItem(Constants.GENERAL);
 		type.addItem(Constants.USER);
-		type.addItem(Constants.LANGUAGE);
+		type.addItem(Constants.HASHTAGS);
 
 		CSSAndImageResources.INSTANCE.main().ensureInjected();
 		CSSAndImageResources.INSTANCE.header().ensureInjected();
+
 		searchText.addKeyPressHandler(new KeyPressHandler() {
 
 			@Override
@@ -58,13 +65,21 @@ public class Header extends Composite {
 
 			@Override
 			public void onClick(ClickEvent event) {
-				Search page = new Search(searchText.getText(), type
+				Search page = new Search(searchText.getText().trim(), type
 						.getItemText(type.getSelectedIndex()));
+				searchText.setFocus(true);
 				RootPanel.get("body").clear();
 				RootPanel.get("body").add(page);
 			}
 		});
-
+		searchText.setFocus(true);
+	}
+	
+	public TextBox getSearchBar(){
+		return searchText;
+	}
+	public ListBox getList(){
+		return type;
 	}
 	// public static void switchPage(Button b, final Widget x) {
 	// b.addClickHandler(new ClickHandler() {

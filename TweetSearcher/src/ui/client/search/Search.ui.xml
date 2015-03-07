@@ -7,7 +7,7 @@
 
 	<ui:with field='css' type='ui.client.resources.CSSAndImageResources' />
 	<g:HTMLPanel styleName="{css.header.pageAlign}">
-		<g:HorizontalPanel>
+		<g:HorizontalPanel ui:field="main">
 			<g:VerticalPanel>
 				<g:VerticalPanel ui:field="results" />
 			</g:VerticalPanel>

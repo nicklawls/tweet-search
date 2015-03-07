@@ -8,21 +8,18 @@
 	<ui:with field='css' type='ui.client.resources.CSSAndImageResources' />
 	<g:HTMLPanel styleName="{css.main.sep}">
 		<g:HTMLPanel>
-			<g:Anchor ui:field="linkTitle" />
+			<g:Anchor ui:field="linkTitle" styleName="{css.main.center} {css.main.largeText}" />
 		</g:HTMLPanel>
 		<g:HorizontalPanel>
 			<g:VerticalPanel>
 				<g:Image ui:field="userImg" />
 				<g:Label ui:field="userName" />
-				<g:HorizontalPanel>
-					<g:Label>Creation: </g:Label>
-					<g:Label ui:field="creation" />
-				</g:HorizontalPanel>
-				<g:HorizontalPanel>
+				<g:Label ui:field="creation" />
+				<g:HorizontalPanel ui:field="retweetPanel">
 					<g:Label>Retweets:</g:Label>
 					<g:Label ui:field="retweets" />
 				</g:HorizontalPanel>
-				<g:HorizontalPanel>
+				<g:HorizontalPanel ui:field="favoritePanel">
 					<g:Label>Favorites:</g:Label>
 					<g:Label ui:field="favorites" />
 				</g:HorizontalPanel>
@@ -30,6 +27,7 @@
 
 			<g:VerticalPanel styleName="{css.main.sepLeft}">
 				<g:Label ui:field="body" />
+				<g:HorizontalPanel ui:field="tags" spacing="10" />
 			</g:VerticalPanel>
 
 		</g:HorizontalPanel>

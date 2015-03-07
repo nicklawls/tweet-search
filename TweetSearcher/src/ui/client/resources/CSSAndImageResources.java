@@ -14,6 +14,9 @@ public interface CSSAndImageResources extends ClientBundle {
 	@Source("images/redMarker.png")
 	ImageResource markerRed();
 	
+	@Source("images/default.jpg")
+	ImageResource defaultImg();
+	
 
 	@Source("css/header.css")
 	header header();
@@ -30,5 +33,7 @@ public interface CSSAndImageResources extends ClientBundle {
 		String button();
 		String sep();
 		String sepLeft();
+		String center();
+		String largeText();
 	}
 }
