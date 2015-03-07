@@ -26,12 +26,6 @@ public class Header extends Composite {
 
 	private static HeaderUiBinder uiBinder = GWT.create(HeaderUiBinder.class);
 	
-	private static Header myInstance = new Header();
-	
-	public static synchronized Header getInstance() {
-		return myInstance;
-	}
-
 	interface HeaderUiBinder extends UiBinder<Widget, Header> {
 	}
 

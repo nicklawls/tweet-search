@@ -1,11 +1,13 @@
 package ui.client.search;
 
+import ui.client.header.ContentContainer;
 import ui.client.header.Header;
 import ui.client.resources.CSSAndImageResources;
 import ui.client.services.LuceneService;
 import ui.client.services.LuceneServiceAsync;
 import ui.shared.Tweet;
 
+import com.gargoylesoftware.htmlunit.javascript.host.Window;
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -61,10 +63,7 @@ public class DisplayTweet extends Composite {
 			// userImg.setVisible(false);
 		} else {
 			userImg.setUrl(t.getUserImg());
-			if (userImg.getWidth() == 0)
-				userImg.setResource(CSSAndImageResources.INSTANCE.defaultImg());
 		}
-		userImg.setSize("50px", "50px");
 
 		if (t.getRetweets() == 0)
 			retweetPanel.setVisible(false);
@@ -82,21 +81,29 @@ public class DisplayTweet extends Composite {
 			linkTitle.setHref(t.getLink());
 		}
 
+		if (userImg.getWidth() == 0)
+			userImg.setResource(CSSAndImageResources.INSTANCE.defaultImg());
+		userImg.setSize("50px", "50px");
+
 		if (t.getHashtags() != null) {
 			String[] separate = t.getHashtags().split(" ");
-			for (String s : separate) {
+			for (final String s : separate) {
 				Anchor newTag = new Anchor("#" + s);
 				newTag.addClickHandler(new ClickHandler() {
 
 					@Override
 					public void onClick(ClickEvent event) {
+						ContentContainer.getInstance().getHeader()
+								.getSearchBar().setText(s);
+						ContentContainer.getInstance().getHeader()
+								.getSearchBar().setFocus(true);
+						ContentContainer.getInstance().getHeader().getList()
+								.setSelectedIndex(2);
+						ContentContainer.getInstance().updatePosition(0);
 
 					}
 				});
-				// newTag.setHref("https://twitter.com/search?q=%23" + s
-				// + "&src=typd");
-				Header.getInstance().getSearchBar().setText(s);
-				Header.getInstance().getList().setSelectedIndex(2);
+
 				tags.add(newTag);
 			}
 		}

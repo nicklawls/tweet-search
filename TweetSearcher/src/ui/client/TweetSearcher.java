@@ -1,5 +1,6 @@
 package ui.client;
 
+import ui.client.header.ContentContainer;
 import ui.client.header.Header;
 
 import com.google.gwt.core.client.EntryPoint;
@@ -27,8 +28,9 @@ public class TweetSearcher implements EntryPoint {
 	 * This is the entry point method.
 	 */
 	public void onModuleLoad() {
-		
+
 		Header h = new Header();
+		ContentContainer.getInstance().setHeader(h);
 		RootPanel.get("header").add(h);
 	}
 }
