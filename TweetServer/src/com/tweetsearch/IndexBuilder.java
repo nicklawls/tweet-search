@@ -125,7 +125,7 @@ public class IndexBuilder {
 											break;
 										case "retweet_count":
 											Integer retweets = Integer.parseInt(json.get("retweet_count").toString());
-											AddIntField("favoriteCount", retweets, doc);
+											AddIntField("retweets", retweets, doc);
 											break;
 										case "language": AddStringField("language", json.get("language").toString(), doc);
 											break;
