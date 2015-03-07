@@ -1,7 +1,9 @@
 package ui.client.search;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import ui.client.resources.CSSAndImageResources;
 import ui.client.services.LuceneService;
 import ui.client.services.LuceneServiceAsync;
 import ui.shared.Tweet;
@@ -14,8 +16,14 @@ import com.google.gwt.maps.client.MapOptions;
 import com.google.gwt.maps.client.MapTypeId;
 import com.google.gwt.maps.client.MapWidget;
 import com.google.gwt.maps.client.base.LatLng;
+import com.google.gwt.maps.client.base.LatLngBounds;
+import com.google.gwt.maps.client.events.MapEventType;
+import com.google.gwt.maps.client.events.MapHandlerRegistration;
 import com.google.gwt.maps.client.events.bounds.BoundsChangeMapEvent;
 import com.google.gwt.maps.client.events.bounds.BoundsChangeMapHandler;
+import com.google.gwt.maps.client.overlays.Marker;
+import com.google.gwt.maps.client.overlays.MarkerImage;
+import com.google.gwt.maps.client.overlays.MarkerOptions;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -47,20 +55,29 @@ public class Search extends Composite {
 	public Search() {
 		initWidget(uiBinder.createAndBindUi(this));
 	}
-	
+
 	double start = 0;
+
+	MapWidget map = null;
+	LatLngBounds bounds = LatLngBounds.newInstance(LatLng.newInstance(0, 0),
+			LatLng.newInstance(0, 0));
+
+	// List<Marker> markers = new ArrayList<Marker>();
+	// HashMap<Integer,Marker> markers = new HashMap<Integer,Marker>();
 
 	public Search(String query, String type) {
 		initWidget(uiBinder.createAndBindUi(this));
 
-		// LatLng location = LatLng.newInstance(39.509, -98.434);
-		// MapOptions opts = MapOptions.newInstance();
-		// opts.setCenter(location);
-		// opts.setMapTypeId(MapTypeId.ROADMAP);
-		// opts.setZoom(12);
+		mapPanel.clear();
+		LatLng location = LatLng.newInstance(33.8833, -117.0167);
+		MapOptions opts = MapOptions.newInstance();
+		opts.setCenter(location);
+		opts.setMapTypeId(MapTypeId.ROADMAP);
+		opts.setZoom(6);
 		// final MapWidget theMap = new MapWidget(opts);
-		// theMap.setSize("500px", "500px");
-		// mapPanel.add(theMap);
+		map = new MapWidget(opts);
+		map.setSize("500px", "500px");
+		mapPanel.add(map);
 
 		LuceneServiceAsync luceneService = GWT.create(LuceneService.class);
 		start = System.currentTimeMillis();
@@ -75,14 +92,38 @@ public class Search extends Composite {
 			public void onSuccess(List<Tweet> result) {
 				if (result.size() != 0) {
 					double timeres = ((System.currentTimeMillis() - start) * 1.0) / 1000;
-					results.add(new Label (result.size()+ " tweets found in " + timeres + " seconds"));
+					results.add(new Label(result.size() + " tweets found in "
+							+ timeres + " seconds"));
 					for (Tweet t : result) {
-						results.add(new DisplayTweet(t));
+						results.add(new DisplayTweet(t, start));
+						addMarkerToMap(t.getLatitude(), t.getLongitude());
 					}
+					resize(true);
 				} else {
 					results.add(new Label("Sorry, no results were found!"));
+					resize(false);
 				}
+
 			}
 		});
+	}
+
+	private void addMarkerToMap(double lat, double lng) {
+		LatLng loc = LatLng.newInstance(lat, lng);
+		MarkerOptions mopts = MarkerOptions.newInstance();
+		mopts.setIcon(MarkerImage.newInstance(CSSAndImageResources.INSTANCE
+				.markerRed().getSafeUri().asString()));
+		mopts.setPosition(loc);
+		Marker localMark = Marker.newInstance(mopts);
+		bounds.extend(loc);
+		localMark.setMap(map);
+	}
+
+	public void resize(Boolean fitMap) {
+		if (fitMap)
+			map.fitBounds(bounds);
+		LatLng center = map.getCenter();
+		MapHandlerRegistration.trigger(map, MapEventType.RESIZE);
+		map.setCenter(center);
 	}
 }

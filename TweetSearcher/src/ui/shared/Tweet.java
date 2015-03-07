@@ -10,7 +10,7 @@ public class Tweet implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private String createdAt;
+	private double createdAt;
 
 	private int favoriteCount;
 	private int retweets;
@@ -25,16 +25,26 @@ public class Tweet implements Serializable {
 	private String text;
 	private String link;
 	private String linkTitle;
+	private String hashtags;
+	private String userImg;
+
+	public String getUserImg() {
+		return userImg;
+	}
 
 	public static long getSerialversionuid() {
 		return serialVersionUID;
+	}
+
+	public String getHashtags() {
+		return hashtags;
 	}
 
 	public String getLinkTitle() {
 		return linkTitle;
 	}
 
-	public String getCreatedAt() {
+	public double getCreatedAt() {
 		return createdAt;
 	}
 
@@ -74,26 +84,31 @@ public class Tweet implements Serializable {
 
 	}
 
-	public Tweet(String createdAt, int favoriteCount, int retweets,
-			float longitude, float latitude, String language, String username,
-			String text, String linkTitle, String link) {
-		super();
-		this.createdAt = createdAt;
-		this.favoriteCount = favoriteCount;
-		this.retweets = retweets;
-		this.longitude = longitude;
-		this.latitude = latitude;
-		this.language = language;
-		this.username = username;
-		this.text = text;
-		this.linkTitle = linkTitle;
-		this.link = link;
-	}
+	// public Tweet(String createdAt, int favoriteCount, int retweets,
+	// float longitude, float latitude, String language, String username,
+	// String text, String linkTitle, String link) {
+	// super();
+	// this.createdAt = createdAt;
+	// this.favoriteCount = favoriteCount;
+	// this.retweets = retweets;
+	// this.longitude = longitude;
+	// this.latitude = latitude;
+	// this.language = language;
+	// this.username = username;
+	// this.text = text;
+	// this.linkTitle = linkTitle;
+	// this.link = link;
+	// }
 
 	public Tweet(String createdAt, String favoriteCount, String retweets,
 			String longitude, String latitude, String language,
-			String username, String text, String linkTitle, String link) {
-		this.createdAt = createdAt;
+			String username, String text, String linkTitle, String link,
+			String hashtags,String userImg) {
+		if (createdAt == null) {
+			this.createdAt = 0;
+			System.err.println("NULL CREATION TIME!!");
+		} else
+			this.createdAt = Double.parseDouble(createdAt);
 		if (favoriteCount == null) {
 			this.favoriteCount = 0;
 			System.out.println("FAVORITE COUNT WAS NULL");
@@ -118,5 +133,7 @@ public class Tweet implements Serializable {
 		this.text = text;
 		this.linkTitle = linkTitle;
 		this.link = link;
+		this.hashtags = hashtags;
+		this.userImg = userImg;
 	}
 }

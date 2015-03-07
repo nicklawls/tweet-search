@@ -5,10 +5,15 @@ import com.google.gwt.resources.client.ClientBundle;
 import com.google.gwt.resources.client.CssResource;
 import com.google.gwt.resources.client.DataResource;
 import com.google.gwt.resources.client.ImageResource;
+import com.google.gwt.resources.client.ClientBundle.Source;
 
 public interface CSSAndImageResources extends ClientBundle {
 	public static final CSSAndImageResources INSTANCE = GWT
 			.create(CSSAndImageResources.class);
+	
+	@Source("images/redMarker.png")
+	ImageResource markerRed();
+	
 
 	@Source("css/header.css")
 	header header();

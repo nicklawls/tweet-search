@@ -62,8 +62,8 @@ public class LuceneServiceImpl extends RemoteServiceServlet implements
 		try {
 			if (isearcher == null)
 				initSearcher();
-//			if (searchText.length() == 0)
-//				searchText = "test";
+			// if (searchText.length() == 0)
+			// searchText = "test";
 			// String[] fields = { "user", "text", "created_at", "geo_location",
 			// "linkTitle", "hasBadLink" };
 
@@ -73,8 +73,11 @@ public class LuceneServiceImpl extends RemoteServiceServlet implements
 			StandardAnalyzer analyzer = new StandardAnalyzer(Version.LUCENE_40);
 			MultiFieldQueryParser mfqp = new MultiFieldQueryParser(
 					Version.LUCENE_40, fields, analyzer);
+			Query q = null;
 
-			Query q = new TermQuery(new Term("text", searchText));
+			q = new TermQuery(new Term("text", searchText));
+			bq.add(q, Occur.SHOULD);
+			q = new TermQuery(new Term("user", searchText));
 			bq.add(q, Occur.SHOULD);
 
 			TopScoreDocCollector collector = TopScoreDocCollector.create(10,
@@ -111,22 +114,26 @@ public class LuceneServiceImpl extends RemoteServiceServlet implements
 		// d.get("username"), d.get("text"), d.get("link"));
 		Tweet t = new Tweet(d.get("created_at"), d.get("favoriteCount"),
 				d.get("retweets"), d.get("longitude"), d.get("latitude"),
-				d.get("language"), d.get("user"), d.get("text"),
-				d.get("link"),getUrlStringFrom(d.get("text")));
+				d.get("language"), d.get("user"), d.get("text"), d.get("link"),
+				getUrlStringFrom(d.get("text")), d.get("hashtags"),
+				d.get("profileImageUrl"));
 
 		return t;
 	}
-	
+
 	private String getUrlStringFrom(String text) {
 		String[] words = text.split("\\s+|”|\"");
 		String urlString = null;
 
-		for (String word : words) try {
-				URL url = new URL(word); // parse with URL constructor				
+		for (String word : words)
+			try {
+				URL url = new URL(word); // parse with URL constructor
 				urlString = url.toString(); // but just returns a string
-				
+
 				if (urlString.endsWith(".")) {
-					urlString = urlString.substring(0, urlString.length()-1); // shave off "."
+					urlString = urlString.substring(0, urlString.length() - 1); // shave
+																				// off
+																				// "."
 				}
 			} catch (MalformedURLException e) {
 				// Exception-based control flow FTW

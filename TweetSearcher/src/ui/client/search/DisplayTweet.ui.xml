@@ -2,13 +2,17 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:w="urn:import:com.google.gwt.widget.client">
 	<ui:style>
-
+	
 	</ui:style>
 
 	<ui:with field='css' type='ui.client.resources.CSSAndImageResources' />
 	<g:HTMLPanel styleName="{css.main.sep}">
+		<g:HTMLPanel>
+			<g:Anchor ui:field="linkTitle" />
+		</g:HTMLPanel>
 		<g:HorizontalPanel>
 			<g:VerticalPanel>
+				<g:Image ui:field="userImg" />
 				<g:Label ui:field="userName" />
 				<g:HorizontalPanel>
 					<g:Label>Creation: </g:Label>
@@ -26,7 +30,6 @@
 
 			<g:VerticalPanel styleName="{css.main.sepLeft}">
 				<g:Label ui:field="body" />
-				<g:Anchor ui:field="link" />
 			</g:VerticalPanel>
 
 		</g:HorizontalPanel>
