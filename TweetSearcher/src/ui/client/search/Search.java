@@ -1,8 +1,10 @@
 package ui.client.search;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
+import ui.client.header.ContentContainer;
 import ui.client.resources.CSSAndImageResources;
 import ui.client.services.LuceneService;
 import ui.client.services.LuceneServiceAsync;
@@ -21,11 +23,15 @@ import com.google.gwt.maps.client.events.MapEventType;
 import com.google.gwt.maps.client.events.MapHandlerRegistration;
 import com.google.gwt.maps.client.events.bounds.BoundsChangeMapEvent;
 import com.google.gwt.maps.client.events.bounds.BoundsChangeMapHandler;
+import com.google.gwt.maps.client.events.click.ClickMapEvent;
+import com.google.gwt.maps.client.events.click.ClickMapHandler;
+import com.google.gwt.maps.client.overlays.Animation;
 import com.google.gwt.maps.client.overlays.Marker;
 import com.google.gwt.maps.client.overlays.MarkerImage;
 import com.google.gwt.maps.client.overlays.MarkerOptions;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
@@ -65,7 +71,6 @@ public class Search extends Composite {
 			LatLng.newInstance(0, 0));
 
 	// List<Marker> markers = new ArrayList<Marker>();
-	// HashMap<Integer,Marker> markers = new HashMap<Integer,Marker>();
 
 	public Search(String query, String type) {
 		initWidget(uiBinder.createAndBindUi(this));
@@ -106,8 +111,58 @@ public class Search extends Composite {
 					results.add(new Label(result.size() + " tweets found in "
 							+ timeres + " seconds"));
 					for (Tweet t : result) {
-						results.add(new DisplayTweet(t, start));
-						addMarkerToMap(t.getLatitude(), t.getLongitude());
+						final DisplayTweet dis = new DisplayTweet(t, start);
+						final Marker m = addMarkerToMap(t.getLatitude(),
+								t.getLongitude());
+
+						m.addClickHandler(new ClickMapHandler() {
+
+							@Override
+							public void onEvent(ClickMapEvent event) {
+								dis.getMainPanel().setStyleName(
+										CSSAndImageResources.INSTANCE.main()
+												.standout(), true);
+								ContentContainer.getInstance()
+										.updatePosition(
+												dis.getMainPanel()
+														.getAbsoluteTop() - 2);
+								Timer t = new Timer() {
+									@Override
+									public void run() {
+										dis.getMainPanel().setStyleName(
+												CSSAndImageResources.INSTANCE
+														.main().sep());
+										dis.getMainPanel().setStyleName(
+												CSSAndImageResources.INSTANCE
+														.main().hover(), true);
+									}
+								};
+
+								t.schedule(1000);
+							}
+						});
+
+						dis.getMainPanel().addDomHandler(new ClickHandler() {
+
+							@Override
+							public void onClick(ClickEvent event) {
+								if (m.getAnimation() == null) {
+									m.setAnimation(Animation.BOUNCE);
+									Timer t = new Timer() {
+										@Override
+										public void run() {
+											m.setAnimation(null);
+											cancel();
+										}
+									};
+									ContentContainer.getInstance()
+											.updatePosition(0);
+									t.schedule(780);
+								}
+							}
+						}, ClickEvent.getType());
+						results.add(dis);
+
 					}
 					resize(true);
 				} else {
@@ -119,7 +174,7 @@ public class Search extends Composite {
 		});
 	}
 
-	private void addMarkerToMap(double lat, double lng) {
+	private Marker addMarkerToMap(double lat, double lng) {
 		LatLng loc = LatLng.newInstance(lat, lng);
 		MarkerOptions mopts = MarkerOptions.newInstance();
 		mopts.setIcon(MarkerImage.newInstance(CSSAndImageResources.INSTANCE
@@ -129,6 +184,7 @@ public class Search extends Composite {
 		bounds.extend(loc);
 		localMark.setMap(map);
 		mapPanel.setVisible(true);
+		return localMark;
 	}
 
 	public void resize(Boolean fitMap) {

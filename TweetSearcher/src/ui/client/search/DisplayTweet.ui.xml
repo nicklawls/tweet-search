@@ -6,15 +6,15 @@
 	</ui:style>
 
 	<ui:with field='css' type='ui.client.resources.CSSAndImageResources' />
-	<g:HTMLPanel styleName="{css.main.sep}">
+	<g:HTMLPanel styleName="{css.main.sep} {css.main.hover}" ui:field="mainPanel">
 		<g:HTMLPanel>
 			<g:Anchor ui:field="linkTitle" styleName="{css.main.center} {css.main.largeText}" />
 		</g:HTMLPanel>
 		<g:HorizontalPanel>
-			<g:VerticalPanel>
-				<g:Image ui:field="userImg" />
-				<g:Anchor ui:field="userName" styleName="{css.main.pointer}"/>
-				<g:Label ui:field="creation" />
+			<g:VerticalPanel styleName="{css.main.sameWidth}">
+				<g:Image ui:field="userImg" styleName="{css.main.center}"/>
+				<g:Anchor ui:field="userName" styleName="{css.main.pointer} {css.main.center}"/>
+				<g:Label ui:field="creation" styleName="{css.main.nowrap}" />
 				<g:HorizontalPanel ui:field="retweetPanel">
 					<g:Label>Retweets:</g:Label>
 					<g:Label ui:field="retweets" />

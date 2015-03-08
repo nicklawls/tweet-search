@@ -37,6 +37,8 @@ public class Header extends Composite {
 	Button searchButton;
 	@UiField
 	HorizontalPanel main;
+	@UiField
+	Image image;
 
 	public Header() {
 		initWidget(uiBinder.createAndBindUi(this));
@@ -44,6 +46,8 @@ public class Header extends Composite {
 		type.addItem(Constants.USER);
 		type.addItem(Constants.HASHTAGS);
 
+//		image.setSize("400px", "200px");
+		
 		CSSAndImageResources.INSTANCE.main().ensureInjected();
 		CSSAndImageResources.INSTANCE.header().ensureInjected();
 

@@ -16,6 +16,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
@@ -50,6 +51,12 @@ public class DisplayTweet extends Composite {
 	HorizontalPanel retweetPanel;
 	@UiField
 	HorizontalPanel favoritePanel;
+	@UiField
+	HTMLPanel mainPanel;
+
+	public HTMLPanel getMainPanel() {
+		return mainPanel;
+	}
 
 	DisplayTweet(final Tweet t, double curTime) {
 		long timeAgo = (long) ((curTime - t.getCreatedAt()) / 1000);

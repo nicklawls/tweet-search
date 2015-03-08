@@ -17,6 +17,9 @@ public interface CSSAndImageResources extends ClientBundle {
 	@Source("images/default.jpg")
 	ImageResource defaultImg();
 	
+	@Source("images/header.jpg")
+	ImageResource headerImg();
+	
 
 	@Source("css/header.css")
 	header header();
@@ -36,5 +39,9 @@ public interface CSSAndImageResources extends ClientBundle {
 		String center();
 		String largeText();
 		String pointer();
+		String hover();
+		String nowrap();
+		String standout();
+		String sameWidth();
 	}
 }
