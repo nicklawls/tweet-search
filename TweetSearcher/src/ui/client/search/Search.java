@@ -161,7 +161,9 @@ public class Search extends Composite {
 								}
 							}
 						}, ClickEvent.getType());
+						
 						results.add(dis);
+						System.out.println("updating after added to panel");
 
 					}
 					resize(true);

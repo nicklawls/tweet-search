@@ -9,10 +9,14 @@ import ui.shared.Tweet;
 
 import com.gargoylesoftware.htmlunit.javascript.host.Window;
 import com.google.gwt.core.shared.GWT;
+import com.google.gwt.dev.resource.Resource;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.ErrorEvent;
+import com.google.gwt.event.dom.client.ErrorHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
@@ -77,13 +81,18 @@ public class DisplayTweet extends Composite {
 			}
 		});
 		body.setText(t.getText());
-
+		userImg.addErrorHandler(new ErrorHandler() {
+			@Override
+			public void onError(ErrorEvent event) {
+				userImg.setResource(CSSAndImageResources.INSTANCE.defaultImg());
+			}
+		});
 		if (t.getUserImg() == null) {
 			userImg.setResource(CSSAndImageResources.INSTANCE.defaultImg());
-			// userImg.setVisible(false);
 		} else {
 			userImg.setUrl(t.getUserImg());
 		}
+		userImg.setSize("50px", "50px");
 
 		if (t.getRetweets() == 0)
 			retweetPanel.setVisible(false);
@@ -100,10 +109,6 @@ public class DisplayTweet extends Composite {
 			linkTitle.setText(t.getLinkTitle());
 			linkTitle.setHref(t.getLink());
 		}
-
-		if (userImg.getWidth() == 0)
-			userImg.setResource(CSSAndImageResources.INSTANCE.defaultImg());
-		userImg.setSize("50px", "50px");
 
 		if (t.getHashtags() != null) {
 			String[] separate = t.getHashtags().split(" ");
@@ -178,4 +183,5 @@ public class DisplayTweet extends Composite {
 			return seconds + " years ago";
 
 	}
+
 }

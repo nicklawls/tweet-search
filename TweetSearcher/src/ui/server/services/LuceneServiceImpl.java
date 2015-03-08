@@ -130,12 +130,16 @@ public class LuceneServiceImpl extends RemoteServiceServlet implements
 
 			System.out.println("Looking for general: " + s);
 
-			q = mfqp.parse(mfqp.escape(s));
-			bq.add(q, BooleanClause.Occur.SHOULD);
-			// q = new TermQuery(new Term("text", s));
-			// bq.add(q, Occur.SHOULD);
-			// q = new TermQuery(new Term("hashtags", s));
-			// bq.add(q, Occur.SHOULD);
+			// q = mfqp.parse(mfqp.escape(s));
+			// bq.add(q, BooleanClause.Occur.SHOULD);
+			q = new TermQuery(new Term("text", s));
+			bq.add(q, Occur.SHOULD);
+			q = new TermQuery(new Term("user", s));
+			q.setBoost(5f);
+			bq.add(q, Occur.SHOULD);
+			q = new TermQuery(new Term("hashtags", s));
+			q.setBoost(10f);
+			bq.add(q, Occur.SHOULD);
 		}
 		return getScoreDoc(bq);
 	}
@@ -197,7 +201,6 @@ public class LuceneServiceImpl extends RemoteServiceServlet implements
 			System.out.println("Looking for HashTags: " + s);
 			q = mfqp.parse(mfqp.escape(s));
 			bq.add(q, BooleanClause.Occur.SHOULD);
-
 			// if (s.contains("#"))
 			// s = s.replaceAll("#", "");
 			// q = new TermQuery(new Term("hashtags", s));
