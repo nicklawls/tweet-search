@@ -35,5 +35,6 @@ public interface CSSAndImageResources extends ClientBundle {
 		String sepLeft();
 		String center();
 		String largeText();
+		String pointer();
 	}
 }

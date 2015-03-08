@@ -31,7 +31,7 @@ public class DisplayTweet extends Composite {
 	}
 
 	@UiField
-	Label userName;
+	Anchor userName;
 	@UiField
 	Label body;
 	@UiField
@@ -51,11 +51,24 @@ public class DisplayTweet extends Composite {
 	@UiField
 	HorizontalPanel favoritePanel;
 
-	DisplayTweet(Tweet t, double curTime) {
+	DisplayTweet(final Tweet t, double curTime) {
 		long timeAgo = (long) ((curTime - t.getCreatedAt()) / 1000);
 		initWidget(uiBinder.createAndBindUi(this));
 
 		userName.setText(t.getUsername());
+		userName.addClickHandler(new ClickHandler() {
+
+			@Override
+			public void onClick(ClickEvent event) {
+				ContentContainer.getInstance().getHeader().getSearchBar()
+						.setText(t.getUsername());
+				ContentContainer.getInstance().getHeader().getSearchBar()
+						.setFocus(true);
+				ContentContainer.getInstance().getHeader().getList()
+						.setSelectedIndex(1);
+				ContentContainer.getInstance().updatePosition(0);
+			}
+		});
 		body.setText(t.getText());
 
 		if (t.getUserImg() == null) {

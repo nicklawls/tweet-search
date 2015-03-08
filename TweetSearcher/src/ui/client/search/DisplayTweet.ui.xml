@@ -13,7 +13,7 @@
 		<g:HorizontalPanel>
 			<g:VerticalPanel>
 				<g:Image ui:field="userImg" />
-				<g:Label ui:field="userName" />
+				<g:Anchor ui:field="userName" styleName="{css.main.pointer}"/>
 				<g:Label ui:field="creation" />
 				<g:HorizontalPanel ui:field="retweetPanel">
 					<g:Label>Retweets:</g:Label>

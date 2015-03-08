@@ -25,3 +25,7 @@
 .largeText{
 	font-size:150%;
 }
+
+.pointer{
+	cursor:pointer;
+}
