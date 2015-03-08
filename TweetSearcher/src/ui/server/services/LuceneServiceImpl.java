@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.DirectoryReader;
@@ -22,6 +23,7 @@ import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.NumericRangeQuery;
+import org.apache.lucene.search.PhraseQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.Sort;
@@ -75,35 +77,19 @@ public class LuceneServiceImpl extends RemoteServiceServlet implements
 			if (query.length() == 0)
 				hits = getRecentTweets();
 			else {
+				if (query.contains("#"))
+					query = query.replaceAll("#", " ");
+				if (query.contains("@"))
+					query = query.replaceAll("@", " ");
 				String[] separate = query.split(" ");
 				if (type.equals(Constants.GENERAL))
-					hits = generalSearh(separate);
+					hits = generalSearh(separate, query);
 				else if (type.equals(Constants.HASHTAGS)) {
 					hits = getHashTags(separate);
 				} else if (type.equals(Constants.USER)) {
 					hits = getUser(separate);
 				}
 			}
-
-			// BooleanQuery bq = new BooleanQuery();
-			// String[] fields = new String[] { "user", "text" };
-			//
-			// StandardAnalyzer analyzer = new
-			// StandardAnalyzer(Version.LUCENE_40);
-			// MultiFieldQueryParser mfqp = new MultiFieldQueryParser(
-			// Version.LUCENE_40, fields, analyzer);
-			// Query q = null;
-			//
-			// q = new TermQuery(new Term("text", searchText));
-			// bq.add(q, Occur.SHOULD);
-			// q = new TermQuery(new Term("user", searchText));
-			// bq.add(q, Occur.SHOULD);
-			//
-			// TopScoreDocCollector collector = TopScoreDocCollector.create(10,
-			// true);
-			// isearcher.search(bq, collector);
-			// ScoreDoc[] hits = collector.topDocs().scoreDocs;
-			//
 
 			for (ScoreDoc hit : hits) {
 				Document d = isearcher.doc(hit.doc);
@@ -117,30 +103,43 @@ public class LuceneServiceImpl extends RemoteServiceServlet implements
 		return tweets;
 	}
 
-	private ScoreDoc[] generalSearh(String[] query) throws IOException,
-			ParseException {
+	private ScoreDoc[] generalSearh(String[] query, String exact)
+			throws IOException, ParseException {
 		BooleanQuery bq = new BooleanQuery();
 		Query q = null;
-		String[] fields = new String[] { "text", "hashtags", "user" };
-		StandardAnalyzer sa = new StandardAnalyzer(Version.LUCENE_40);
-		MultiFieldQueryParser mfqp = new MultiFieldQueryParser(
-				Version.LUCENE_40, fields, sa);
+		Analyzer anl = new StandardAnalyzer();
+		QueryParser pars = null;
 
+		String m = null;
 		for (String s : query) {
-
-			System.out.println("Looking for general: " + s);
-
-			// q = mfqp.parse(mfqp.escape(s));
-			// bq.add(q, BooleanClause.Occur.SHOULD);
-			q = new TermQuery(new Term("text", s));
+			if (s.length() == 0)
+				continue;
+			pars = new QueryParser("text", anl);
+			q = pars.parse(QueryParser.escape(s));
+			// q = new TermQuery(new Term("text", s));
 			bq.add(q, Occur.SHOULD);
-			q = new TermQuery(new Term("user", s));
-			q.setBoost(5f);
+
+			pars = new QueryParser("user", anl);
+			q = pars.parse(QueryParser.escape(s));
+			// m = s.replaceAll("@", "");
+			// q = new TermQuery(new Term("user", m));
+			// q.setBoost(5f);
 			bq.add(q, Occur.SHOULD);
-			q = new TermQuery(new Term("hashtags", s));
-			q.setBoost(10f);
+
+			pars = new QueryParser("link", anl);
+			q = pars.parse(QueryParser.escape(s));
+			// q = new TermQuery(new Term("link", s));
+			q.setBoost(2f);
+			bq.add(q, Occur.SHOULD);
+
+			m = s.replaceAll("#", "");
+			pars = new QueryParser("hashtags", anl);
+			q = pars.parse(QueryParser.escape(s));
+			// q = new TermQuery(new Term("hashtags", m));
+			q.setBoost(2f);
 			bq.add(q, Occur.SHOULD);
 		}
+
 		return getScoreDoc(bq);
 	}
 
@@ -149,7 +148,6 @@ public class LuceneServiceImpl extends RemoteServiceServlet implements
 		Query q = null;
 		q = NumericRangeQuery.newIntRange("retweets", 0, 100, true, true);
 		bq.add(q, Occur.MUST);
-		System.out.println("Getting recent tweets");
 		Sort sorter = new Sort();
 		SortField sf = new SortField("created_at", Type.LONG, true);
 		sorter.setSort(sf);
@@ -161,30 +159,17 @@ public class LuceneServiceImpl extends RemoteServiceServlet implements
 			ParseException {
 		BooleanQuery bq = new BooleanQuery();
 		Query q = null;
-		// String[] fields = new String[] { "text", "user" };
-		// StandardAnalyzer sa = new StandardAnalyzer(Version.LUCENE_40);
-		// MultiFieldQueryParser mfqp = new MultiFieldQueryParser(
-		// Version.LUCENE_40, fields, sa);
+		Analyzer anl = new StandardAnalyzer();
+		QueryParser pars = null;
 
 		for (String s : users) {
-			System.out.println("Looking for User: " + s);
-			// q = mfqp.parse(mfqp.escape(s));
-			// bq.add(q, BooleanClause.Occur.SHOULD);
-
-			q = new TermQuery(new Term("user", s));
-			bq.add(q, Occur.SHOULD);
-			// s = "@" + s;
-			// System.out.println("looking for text: " + s);
-			// q = new TermQuery(new Term("text", s));
-			// bq.add(q, Occur.SHOULD);
-
-			// if (s.contains("@"))
-			// s = s.replaceAll("@", "");
+			if (s.length() == 0)
+				continue;
+			s = s.replaceAll("@", "");
+			pars = new QueryParser("user", anl);
+			q = pars.parse(QueryParser.escape(s));
 			// q = new TermQuery(new Term("user", s));
-			// bq.add(q, Occur.SHOULD);
-			// s = "@" + s;
-			// q = new TermQuery(new Term("text", s));
-			// bq.add(q, Occur.SHOULD);
+			bq.add(q, Occur.SHOULD);
 		}
 		return getScoreDoc(bq);
 	}
@@ -193,18 +178,17 @@ public class LuceneServiceImpl extends RemoteServiceServlet implements
 			ParseException {
 		BooleanQuery bq = new BooleanQuery();
 		Query q = null;
-		String[] fields = new String[] { "hashtags" };
-		StandardAnalyzer sa = new StandardAnalyzer(Version.LUCENE_40);
-		MultiFieldQueryParser mfqp = new MultiFieldQueryParser(
-				Version.LUCENE_40, fields, sa);
+		Analyzer anl = new StandardAnalyzer();
+		QueryParser pars = null;
 		for (String s : tags) {
-			System.out.println("Looking for HashTags: " + s);
-			q = mfqp.parse(mfqp.escape(s));
-			bq.add(q, BooleanClause.Occur.SHOULD);
-			// if (s.contains("#"))
-			// s = s.replaceAll("#", "");
+			if (s.length() == 0)
+				continue;
+			s = s.replaceAll("#", "");
+			System.out.println("LT=" + s);
+			pars = new QueryParser("hashtags", anl);
+			q = pars.parse(QueryParser.escape(s));
 			// q = new TermQuery(new Term("hashtags", s));
-			// bq.add(q, Occur.SHOULD);
+			bq.add(q, BooleanClause.Occur.SHOULD);
 		}
 		return getScoreDoc(bq);
 	}
@@ -216,17 +200,6 @@ public class LuceneServiceImpl extends RemoteServiceServlet implements
 	}
 
 	private Tweet newTweet(Document d) throws java.text.ParseException {
-		// DateFormat format = new SimpleDateFormat("", Locale.ENGLISH);
-		// Date date = format.parse(d.get("created_at"));
-		// System.out.println(date);
-		// System.out.println(d.get("created_at"));
-
-		// Tweet t = new Tweet(d.get("created_at"),
-		// Integer.parseInt(d.get("favoriteCount")),
-		// Integer.parseInt(d.get("retweets")), Float.parseFloat(d
-		// .get("longitude")),
-		// Float.parseFloat(d.get("latitude")), d.get("language"),
-		// d.get("username"), d.get("text"), d.get("link"));
 		Tweet t = new Tweet(d.get("created_at"), d.get("favoriteCount"),
 				d.get("retweets"), d.get("longitude"), d.get("latitude"),
 				d.get("language"), d.get("user"), d.get("text"), d.get("link"),

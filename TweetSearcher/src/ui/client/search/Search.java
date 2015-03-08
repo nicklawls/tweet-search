@@ -161,14 +161,16 @@ public class Search extends Composite {
 								}
 							}
 						}, ClickEvent.getType());
-						
+
 						results.add(dis);
-						System.out.println("updating after added to panel");
 
 					}
 					resize(true);
 				} else {
-					results.add(new Label("Sorry, no results were found!"));
+					Label nores = new Label("Sorry, no results were found!");
+					nores.setStyleName(CSSAndImageResources.INSTANCE.main()
+							.nowrap());
+					results.add(nores);
 					resize(false);
 				}
 

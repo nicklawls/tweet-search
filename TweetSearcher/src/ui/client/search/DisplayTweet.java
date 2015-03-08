@@ -71,13 +71,15 @@ public class DisplayTweet extends Composite {
 
 			@Override
 			public void onClick(ClickEvent event) {
-				ContentContainer.getInstance().getHeader().getSearchBar()
-						.setText(t.getUsername());
-				ContentContainer.getInstance().getHeader().getSearchBar()
-						.setFocus(true);
-				ContentContainer.getInstance().getHeader().getList()
-						.setSelectedIndex(1);
-				ContentContainer.getInstance().updatePosition(0);
+				if (ContentContainer.getInstance().getHeader().getList()
+						.getSelectedIndex() != 1) {
+					updateSearchText(t.getUsername(), 1);
+
+				} else {
+					updateSearchText(ContentContainer.getInstance().getHeader()
+							.getSearchBar().getText()
+							+ " " + t.getUsername(), 1);
+				}
 			}
 		});
 		body.setText(t.getText());
@@ -118,13 +120,14 @@ public class DisplayTweet extends Composite {
 
 					@Override
 					public void onClick(ClickEvent event) {
-						ContentContainer.getInstance().getHeader()
-								.getSearchBar().setText(s);
-						ContentContainer.getInstance().getHeader()
-								.getSearchBar().setFocus(true);
-						ContentContainer.getInstance().getHeader().getList()
-								.setSelectedIndex(2);
-						ContentContainer.getInstance().updatePosition(0);
+						if (ContentContainer.getInstance().getHeader()
+								.getList().getSelectedIndex() != 2) {
+							updateSearchText(s, 2);
+						} else {
+							updateSearchText(ContentContainer.getInstance()
+									.getHeader().getSearchBar().getText()
+									+ " " + s, 2);
+						}
 
 					}
 				});
@@ -132,6 +135,15 @@ public class DisplayTweet extends Composite {
 				tags.add(newTag);
 			}
 		}
+	}
+
+	private void updateSearchText(String s, int index) {
+		ContentContainer.getInstance().getHeader().getSearchBar().setText(s);
+		ContentContainer.getInstance().getHeader().getList()
+				.setSelectedIndex(index);
+		ContentContainer.getInstance().updatePosition(0);
+		ContentContainer.getInstance().getHeader().getSearchBar()
+				.setFocus(true);
 	}
 
 	private String getTimeAgo(long seconds) {

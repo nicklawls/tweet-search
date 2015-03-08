@@ -117,7 +117,7 @@ public class IndexBuilder {
 											AddFloatField("latitude", Float.parseFloat(lat), doc);
 											AddFloatField("longitude", Float.parseFloat(lon), doc);
 											break;
-										case "linkTitle": AddStringField("link", json.get("linkTitle").toString(), doc);
+										case "linkTitle": AddTextField("link", json.get("linkTitle").toString(), doc);
 											break;
 										case "favorite_count": 
 											Integer favoriteCount = Integer.parseInt(json.get("favorite_count").toString());

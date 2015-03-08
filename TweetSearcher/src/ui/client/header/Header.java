@@ -47,6 +47,7 @@ public class Header extends Composite {
 		type.addItem(Constants.HASHTAGS);
 
 //		image.setSize("400px", "200px");
+		searchText.setWidth("500px");
 		
 		CSSAndImageResources.INSTANCE.main().ensureInjected();
 		CSSAndImageResources.INSTANCE.header().ensureInjected();
