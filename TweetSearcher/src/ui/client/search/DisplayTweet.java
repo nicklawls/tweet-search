@@ -172,7 +172,7 @@ public class DisplayTweet extends Composite {
 			if (seconds == 1)
 				return "1 day ago";
 			else
-				return seconds + " hours ago";
+				return seconds + " days ago";
 		}
 		seconds /= 7;
 		if (seconds / 4 == 0) {
