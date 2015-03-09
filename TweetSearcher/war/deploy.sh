@@ -10,5 +10,5 @@ mv "$APPNAME.zip" "$APPNAME.war"
 sudo rm -rf "$TOMCATFOLDER/webpps/$APPNAME" "$TOMCATFOLDER/webpps/$APPNAME.war"
 sudo rm -rf "$TOMCATFOLDER/$LUCENEFOLDER"
 sudo cp -r $LUCENEFOLDER "$TOMCATFOLDER/indexes"
-sudo mv "$APPNAME.war" $APPFOLDER/
+sudo mv "$APPNAME.war" "$TOMCATFOLDER/webapps"
 
